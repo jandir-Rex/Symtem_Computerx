@@ -48,6 +48,7 @@
     },
     "scripts": {
         "post-autoload-dump": [
+            "@php -r \"!file_exists('bootstrap/cache') && mkdir('bootstrap/cache', 0755, true);\"",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
@@ -90,5 +91,4 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true
-
 }
