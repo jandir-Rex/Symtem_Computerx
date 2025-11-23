@@ -13,7 +13,6 @@
         "greenter/report": "5.1",
         "greenter/ws": "5.1",
         "greenter/xml": "5.1",
-        "jeroennoten/laravel-adminlte": "^3.15",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
