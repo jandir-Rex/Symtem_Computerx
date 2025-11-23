@@ -1,9 +1,7 @@
 build:
   commands:
-    - chmod -R 777 bootstrap/cache
-
-deploy:
-  commands:
-    - php artisan config:cache
-    - php artisan route:cache
-    - php artisan view:cache
+    - mkdir -p bootstrap/cache
+    - mkdir -p storage/framework/cache
+    - mkdir -p storage/framework/sessions
+    - mkdir -p storage/framework/views
+    - composer install --no-interaction --prefer-dist --optimize-autoloader

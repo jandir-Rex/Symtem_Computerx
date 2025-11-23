@@ -9,12 +9,18 @@ class ImageHelper
 {
     public static function upload(UploadedFile $file, string $folder = 'productos')
     {
-        // Subir a Cloudinary y devolver la URL
-        $result = Cloudinary::upload(
-            $file->getRealPath(),
-            ['folder' => $folder]
-        );
-        
-        return $result->getSecurePath();
+        try {
+            // Subir a Cloudinary y devolver la URL
+            $result = Cloudinary::upload(
+                $file->getRealPath(),
+                ['folder' => $folder]
+            );
+            
+            return $result->getSecurePath();
+        } catch (\Exception $e) {
+            // Log del error para debugging
+            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }
