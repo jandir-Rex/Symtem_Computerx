@@ -13,8 +13,6 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-
 
 
 class AlmacenController extends Controller
@@ -84,56 +82,45 @@ class AlmacenController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'nombre' => 'required|string|max:255',
-        'codigo_barras' => 'nullable|string|max:100|unique:productos,codigo_barras',
-        'precio_compra' => 'required|numeric|min:0',
-        'precio_venta' => 'required|numeric|min:0',
-        'stock' => 'required|integer|min:0',
-        'stock_minimo' => 'required|integer|min:0',
-        'imagen' => 'nullable|image|max:2048',
-        'categoria' => 'nullable|string|max:100',
-        'marca' => 'nullable|string|max:100',
-        'garantia_meses' => 'nullable|integer|min:0',
-        'descripcion' => 'nullable|string',
-        'activo' => 'nullable',
-        'destacado' => 'nullable',
-        'visible_ecommerce' => 'nullable'
-    ]);
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo_barras' => 'nullable|string|max:100|unique:productos,codigo_barras',
+            'precio_compra' => 'required|numeric|min:0',
+            'precio_venta' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'stock_minimo' => 'required|integer|min:0',
+            'imagen' => 'nullable|image|max:2048',
+            'categoria' => 'nullable|string|max:100',
+            'marca' => 'nullable|string|max:100',
+            'garantia_meses' => 'nullable|integer|min:0',
+            'descripcion' => 'nullable|string',
+            'activo' => 'nullable',
+            'destacado' => 'nullable',
+            'visible_ecommerce' => 'nullable'
+        ]);
 
-    // Convertir checkboxes a booleanos
-    $validated['activo'] = $request->has('activo') ? true : false;
-    $validated['destacado'] = $request->has('destacado') ? true : false;
-    $validated['visible_ecommerce'] = $request->has('visible_ecommerce') ? true : false;
+        // Convertir checkboxes a booleanos
+        $validated['activo'] = $request->has('activo') ? true : false;
+        $validated['destacado'] = $request->has('destacado') ? true : false;
+        $validated['visible_ecommerce'] = $request->has('visible_ecommerce') ? true : false;
 
-    // Calcular precio de venta con IGV (18%)
-    $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
+        // Calcular precio de venta con IGV (18%)
+        $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
-    // Subir imagen a Cloudinary si existe
-    if ($request->hasFile('imagen')) {
-        try {
-            $uploadedFileUrl = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload(
-                $request->file('imagen')->getRealPath(),
-                ['folder' => 'productos']
-            )->getSecurePath();
-            
-            $validated['imagen'] = $uploadedFileUrl;
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['imagen' => 'Error al subir la imagen: ' . $e->getMessage()]);
+        // Subir imagen si existe
+        if ($request->hasFile('imagen')) {
+            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
+
+        $validated['user_id'] = auth()->id() ?? 1;
+        Producto::create($validated);
+
+        // 🤖 LIMPIAR CACHÉ DEL CHATBOT
+        Cache::forget('chatbot_products_context');
+
+        return redirect()->route('almacen.index')->with('success', '✅ Producto creado correctamente con precio + IGV.');
     }
-
-    $validated['user_id'] = auth()->id() ?? 1;
-    Producto::create($validated);
-
-    // 🤖 LIMPIAR CACHÉ DEL CHATBOT
-    \Illuminate\Support\Facades\Cache::forget('chatbot_products_context');
-
-    return redirect()->route('almacen.index')->with('success', '✅ Producto creado correctamente con precio + IGV.');
-}
 
     public function edit(Producto $producto)
     {
@@ -173,37 +160,13 @@ class AlmacenController extends Controller
         $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
         // Manejar imagen
-if ($request->hasFile('imagen')) {
-    try {
-        // Eliminar imagen anterior de Cloudinary si existe
-        if ($producto->imagen && str_starts_with($producto->imagen, 'https://res.cloudinary.com')) {
-            // Extraer el public_id de la URL de Cloudinary
-            $parts = explode('/', parse_url($producto->imagen, PHP_URL_PATH));
-            $filename = pathinfo(end($parts), PATHINFO_FILENAME);
-            $folder = $parts[count($parts) - 2];
-            $publicId = $folder . '/' . $filename;
-            
-            try {
-                \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::destroy($publicId);
-            } catch (\Exception $e) {
-                // Si falla la eliminación, continuar de todas formas
-                \Log::warning('No se pudo eliminar la imagen de Cloudinary: ' . $e->getMessage());
+        if ($request->hasFile('imagen')) {
+            // Eliminar imagen anterior si existe
+            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
+                Storage::disk('public')->delete($producto->imagen);
             }
+            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
-        
-        // Subir nueva imagen a Cloudinary
-        $uploadedFileUrl = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload(
-            $request->file('imagen')->getRealPath(),
-            ['folder' => 'productos']
-        )->getSecurePath();
-        
-        $validated['imagen'] = $uploadedFileUrl;
-    } catch (\Exception $e) {
-        return redirect()->back()
-            ->withInput()
-            ->withErrors(['imagen' => 'Error al subir la imagen: ' . $e->getMessage()]);
-    }
-}
 
         $producto->update($validated);
 
