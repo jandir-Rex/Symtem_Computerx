@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
+
 class AlmacenController extends Controller
 {
     public function index(Request $request)
@@ -109,7 +110,7 @@ class AlmacenController extends Controller
 
         // Subir imagen si existe
         if ($request->hasFile('imagen')) {
-            $validated['imagen'] = \App\Helpers\ImageHelper::upload($request->file('imagen'));
+            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
 
         $validated['user_id'] = auth()->id() ?? 1;
@@ -164,7 +165,7 @@ class AlmacenController extends Controller
             if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
                 Storage::disk('public')->delete($producto->imagen);
             }
-            $validated['imagen'] = \App\Helpers\ImageHelper::upload($request->file('imagen'));
+            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
 
         $producto->update($validated);

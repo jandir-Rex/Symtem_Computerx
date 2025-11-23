@@ -92,5 +92,14 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+
+    
+    "post-install-cmd": [
+        "php artisan storage:link --force"
+    ],
+    "post-update-cmd": [
+        "php artisan storage:link --force"
+    ]
 }
+
