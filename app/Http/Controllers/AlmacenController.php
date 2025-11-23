@@ -173,13 +173,37 @@ class AlmacenController extends Controller
         $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
         // Manejar imagen
-        if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior si existe
-            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
-                Storage::disk('public')->delete($producto->imagen);
+if ($request->hasFile('imagen')) {
+    try {
+        // Eliminar imagen anterior de Cloudinary si existe
+        if ($producto->imagen && str_starts_with($producto->imagen, 'https://res.cloudinary.com')) {
+            // Extraer el public_id de la URL de Cloudinary
+            $parts = explode('/', parse_url($producto->imagen, PHP_URL_PATH));
+            $filename = pathinfo(end($parts), PATHINFO_FILENAME);
+            $folder = $parts[count($parts) - 2];
+            $publicId = $folder . '/' . $filename;
+            
+            try {
+                \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::destroy($publicId);
+            } catch (\Exception $e) {
+                // Si falla la eliminación, continuar de todas formas
+                \Log::warning('No se pudo eliminar la imagen de Cloudinary: ' . $e->getMessage());
             }
-            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
+        
+        // Subir nueva imagen a Cloudinary
+        $uploadedFileUrl = \CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary::upload(
+            $request->file('imagen')->getRealPath(),
+            ['folder' => 'productos']
+        )->getSecurePath();
+        
+        $validated['imagen'] = $uploadedFileUrl;
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['imagen' => 'Error al subir la imagen: ' . $e->getMessage()]);
+    }
+}
 
         $producto->update($validated);
 
