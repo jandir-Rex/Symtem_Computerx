@@ -213,9 +213,13 @@ Route::middleware(['auth'])->prefix('dashboard')->name('dashboard.')->group(func
     Route::get('/usuarios/create', [DashboardController::class, 'usuariosCreate'])->name('usuarios.create');
     Route::post('/usuarios', [DashboardController::class, 'usuariosStore'])->name('usuarios.store');
     Route::get('/usuarios/{id}', [DashboardController::class, 'usuariosShow'])->name('usuarios.show');
-    Route::get('/usuarios/{id}/edit', [DashboardController::class, 'usuariosEdit'])->name('usuarios.edit');
+    Route::get('/usuarios/{id}/edit', [DashboardController::class, 'usuariosEdit'])->name('usuarios.edit'); // ✅ YA EXISTE
     Route::put('/usuarios/{id}', [DashboardController::class, 'usuariosUpdate'])->name('usuarios.update');
-    Route::delete('/usuarios/{id}', [DashboardController::class, 'usuariosDestroy'])->name('usuarios.destroy'); 
+    Route::delete('/usuarios/{id}', [DashboardController::class, 'usuariosDestroy'])->name('usuarios.destroy');
+    
+    // ✅ NUEVA: Toggle estado activo/inactivo
+    Route::post('/usuarios/{id}/toggle-estado', [DashboardController::class, 'usuariosToggleEstado'])
+        ->name('usuarios.toggle-estado'); 
 });
 
 // ============================================
