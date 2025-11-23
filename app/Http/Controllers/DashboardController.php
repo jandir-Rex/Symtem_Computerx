@@ -722,11 +722,13 @@ class DashboardController extends Controller
     $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
     if ($request->hasFile('imagen')) {
-        $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
-    }
+     // Subir a Cloudinary
+        $uploadedFile = $request->file('imagen')->storeOnCloudinary('productos');
+        $validated['imagen'] = $uploadedFile->getSecurePath();
+   }
 
-    $validated['user_id'] = auth()->id() ?? 1;
-    Producto::create($validated);
+     $validated['user_id'] = auth()->id() ?? 1;
+     Producto::create($validated);
 
     Cache::forget('chatbot_products_context');
 
@@ -770,11 +772,17 @@ class DashboardController extends Controller
         $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
         if ($request->hasFile('imagen')) {
-            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
-                Storage::disk('public')->delete($producto->imagen);
-            }
-            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
-        }
+          // Eliminar imagen anterior si existe
+               if ($producto->imagen && str_contains($producto->imagen, 'cloudinary')) {
+          // Si ya está en Cloudinary, puedes eliminarla (opcional)
+           // Cloudinary::destroy($publicId);
+          } elseif ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
+         Storage::disk('public')->delete($producto->imagen);
+         }    
+    // Subir a Cloudinary
+    $uploadedFile = $request->file('imagen')->storeOnCloudinary('productos');
+    $validated['imagen'] = $uploadedFile->getSecurePath();
+}
 
         $producto->update($validated);
         Cache::forget('chatbot_products_context');
