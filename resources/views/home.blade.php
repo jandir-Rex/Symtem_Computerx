@@ -883,162 +883,37 @@
         width: 30px;
         height: 30px;
     }
-
-
-    /* ========================================
-   FIX FLECHAS DEL CARRUSEL PRINCIPAL
-======================================== */
-.carousel-control-prev,
-.carousel-control-next {
-    width: 50px;
-    height: 50px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.carousel-control-prev {
-    left: 20px;
-}
-
-.carousel-control-next {
-    right: 20px;
-}
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-    opacity: 1;
-    background: rgba(220, 53, 69, 0.8);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    width: 30px;
-    height: 30px;
-    background-size: 100%;
-    filter: brightness(0) invert(1);
-}
-
-/* Para asegurar visibilidad en móviles */
-@media (max-width: 768px) {
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        width: 20px;
-        height: 20px;
-    }
-}/* ========================================
-   FIX FLECHAS DEL CARRUSEL PRINCIPAL
-======================================== */
-.carousel-control-prev,
-.carousel-control-next {
-    width: 50px;
-    height: 50px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.carousel-control-prev {
-    left: 20px;
-}
-
-.carousel-control-next {
-    right: 20px;
-}
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-    opacity: 1;
-    background: rgba(220, 53, 69, 0.8);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    width: 30px;
-    height: 30px;
-    background-size: 100%;
-    filter: brightness(0) invert(1);
-}
-
-/* Para asegurar visibilidad en móviles */
-@media (max-width: 768px) {
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        width: 20px;
-        height: 20px;
-    }
-}
-/* Para asegurar visibilidad en móviles */
-@media (max-width: 768px) {
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        width: 20px;
-        height: 20px;
-    }
-}
 }
 </style>
 
-
-@endsection@push('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // ============================================
-    // INICIALIZAR CARRUSEL PRINCIPAL (DESTACADOS)
-    // ============================================
-    const mainCarousel = document.getElementById('mainBannerCarousel');
-    if (mainCarousel) {
-        const bsCarousel = new bootstrap.Carousel(mainCarousel, {
+    // Inicializar carrusel principal
+    const carousel = document.querySelector('#mainBannerCarousel');
+    if (carousel) {
+        new bootstrap.Carousel(carousel, {
             interval: 5000,
             wrap: true,
-            pause: 'hover',
-            touch: true
+            pause: 'hover'
         });
-        
-        console.log('✓ Carrusel principal inicializado');
     }
 });
 
-// ============================================
-// FUNCIÓN GLOBAL PARA CARRUSELES DE PRODUCTOS
-// ============================================
+// Función para controlar los carruseles de productos
 function scrollCarousel(carouselId, direction) {
     const carousel = document.getElementById('carousel-' + carouselId);
     if (!carousel) return;
     
-    const cardWidth = 300;
-    const scrollAmount = cardWidth * direction;
+    const scrollAmount = 300;
+    const currentScroll = carousel.scrollLeft;
+    const targetScroll = currentScroll + (scrollAmount * direction);
     
-    carousel.scrollBy({
-        left: scrollAmount,
+    carousel.scrollTo({
+        left: targetScroll,
         behavior: 'smooth'
     });
 }
 </script>
 @endpush
+@endsection
