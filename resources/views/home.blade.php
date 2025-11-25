@@ -889,49 +889,62 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Inicializar carrusel principal
-    const carousel = document.querySelector('#mainBannerCarousel');
-    if (carousel) {
-        new bootstrap.Carousel(carousel, {
+    // ============================================
+    // INICIALIZAR CARRUSEL PRINCIPAL (DESTACADOS)
+    // ============================================
+    const mainCarousel = document.getElementById('mainBannerCarousel');
+    if (mainCarousel) {
+        // Inicializar con Bootstrap
+        const bsCarousel = new bootstrap.Carousel(mainCarousel, {
             interval: 5000,
             wrap: true,
-            pause: 'hover'
+            pause: 'hover',
+            touch: true
         });
-    }
-});
 
-// Función mejorada para controlar los carruseles de productos
-function scrollCarousel(carouselId, direction) {
-    const carousel = document.getElementById('carousel-' + carouselId);
-    if (!carousel) {
-        console.log('Carrusel no encontrado:', carouselId);
-        return;
-    }
-    
-    const cardWidth = 300; // Ancho de cada card + gap
-    const scrollAmount = cardWidth * direction;
-    
-    carousel.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-    });
-}
+        // Agregar event listeners manuales a los botones por si acaso
+        const prevBtn = mainCarousel.querySelector('.carousel-control-prev');
+        const nextBtn = mainCarousel.querySelector('.carousel-control-next');
 
-// Alternativa: Agregar event listeners directamente
-document.addEventListener('DOMContentLoaded', function() {
-    // Obtener todos los botones de navegación
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                bsCarousel.prev();
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                bsCarousel.next();
+            });
+        }
+
+        console.log('✓ Carrusel principal inicializado');
+    }
+
+    // ============================================
+    // CARRUSELES DE PRODUCTOS (NUEVOS, LAPTOPS, ETC)
+    // ============================================
     document.querySelectorAll('.carousel-nav-btn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            const carouselWrapper = this.closest('.carousel-wrapper');
-            const carousel = carouselWrapper.querySelector('.products-carousel');
+            const carouselId = this.getAttribute('data-carousel');
+            const carousel = document.getElementById('carousel-' + carouselId);
+            
+            if (!carousel) {
+                console.log('Carrusel no encontrado:', carouselId);
+                return;
+            }
+            
             const direction = this.classList.contains('prev-btn') ? -1 : 1;
             const cardWidth = 300;
+            const scrollAmount = cardWidth * direction;
             
             carousel.scrollBy({
-                left: cardWidth * direction,
+                left: scrollAmount,
                 behavior: 'smooth'
             });
         });
