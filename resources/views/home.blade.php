@@ -883,10 +883,130 @@
         width: 30px;
         height: 30px;
     }
+
+
+    /* ========================================
+   FIX FLECHAS DEL CARRUSEL PRINCIPAL
+======================================== */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev {
+    left: 20px;
+}
+
+.carousel-control-next {
+    right: 20px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.8);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+    background-size: 100%;
+    filter: brightness(0) invert(1);
+}
+
+/* Para asegurar visibilidad en móviles */
+@media (max-width: 768px) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+    }
+}/* ========================================
+   FIX FLECHAS DEL CARRUSEL PRINCIPAL
+======================================== */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev {
+    left: 20px;
+}
+
+.carousel-control-next {
+    right: 20px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: rgba(220, 53, 69, 0.8);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+    background-size: 100%;
+    filter: brightness(0) invert(1);
+}
+
+/* Para asegurar visibilidad en móviles */
+@media (max-width: 768px) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+/* Para asegurar visibilidad en móviles */
+@media (max-width: 768px) {
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
 }
 </style>
 
-@push('scripts')
+
+@endsection@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     // ============================================
@@ -894,62 +1014,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================
     const mainCarousel = document.getElementById('mainBannerCarousel');
     if (mainCarousel) {
-        // Inicializar con Bootstrap
         const bsCarousel = new bootstrap.Carousel(mainCarousel, {
             interval: 5000,
             wrap: true,
             pause: 'hover',
             touch: true
         });
-
-        // Agregar event listeners manuales a los botones por si acaso
-        const prevBtn = mainCarousel.querySelector('.carousel-control-prev');
-        const nextBtn = mainCarousel.querySelector('.carousel-control-next');
-
-        if (prevBtn) {
-            prevBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                bsCarousel.prev();
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                bsCarousel.next();
-            });
-        }
-
+        
         console.log('✓ Carrusel principal inicializado');
     }
-
-    // ============================================
-    // CARRUSELES DE PRODUCTOS (NUEVOS, LAPTOPS, ETC)
-    // ============================================
-    document.querySelectorAll('.carousel-nav-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const carouselId = this.getAttribute('data-carousel');
-            const carousel = document.getElementById('carousel-' + carouselId);
-            
-            if (!carousel) {
-                console.log('Carrusel no encontrado:', carouselId);
-                return;
-            }
-            
-            const direction = this.classList.contains('prev-btn') ? -1 : 1;
-            const cardWidth = 300;
-            const scrollAmount = cardWidth * direction;
-            
-            carousel.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        });
-    });
 });
+
+// ============================================
+// FUNCIÓN GLOBAL PARA CARRUSELES DE PRODUCTOS
+// ============================================
+function scrollCarousel(carouselId, direction) {
+    const carousel = document.getElementById('carousel-' + carouselId);
+    if (!carousel) return;
+    
+    const cardWidth = 300;
+    const scrollAmount = cardWidth * direction;
+    
+    carousel.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+    });
+}
 </script>
 @endpush
-@endsection
