@@ -142,7 +142,7 @@
         </div>
         
         <div class="carousel-wrapper position-relative">
-            <button class="carousel-nav-btn prev-btn" type="button" data-carousel="nuevos">
+            <button class="carousel-nav-btn prev-btn" onclick="scrollCarousel('nuevos', -1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             
@@ -192,7 +192,7 @@
                 @endforeach
             </div>
             
-            <button class="carousel-nav-btn next-btn" type="button" data-carousel="nuevos">
+            <button class="carousel-nav-btn next-btn" onclick="scrollCarousel('nuevos', 1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -212,7 +212,7 @@
         </div>
         
         <div class="carousel-wrapper position-relative">
-            <button class="carousel-nav-btn prev-btn" type="button" data-carousel="laptops">
+            <button class="carousel-nav-btn prev-btn" onclick="scrollCarousel('laptops', -1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             
@@ -241,7 +241,7 @@
                 @endforeach
             </div>
             
-            <button class="carousel-nav-btn next-btn" type="button" data-carousel="laptops">
+            <button class="carousel-nav-btn next-btn" onclick="scrollCarousel('laptops', 1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -261,7 +261,7 @@
         </div>
         
         <div class="carousel-wrapper position-relative">
-            <button class="carousel-nav-btn prev-btn" type="button" data-carousel="pcs">
+            <button class="carousel-nav-btn prev-btn" onclick="scrollCarousel('pcs', -1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             
@@ -290,7 +290,7 @@
                 @endforeach
             </div>
             
-            <button class="carousel-nav-btn next-btn" type="button" data-carousel="pcs">
+            <button class="carousel-nav-btn next-btn" onclick="scrollCarousel('pcs', 1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -310,7 +310,7 @@
         </div>
         
         <div class="carousel-wrapper position-relative">
-            <button class="carousel-nav-btn prev-btn" type="button" data-carousel="monitores">
+            <button class="carousel-nav-btn prev-btn" onclick="scrollCarousel('monitores', -1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             
@@ -339,7 +339,7 @@
                 @endforeach
             </div>
             
-            <button class="carousel-nav-btn next-btn" type="button" data-carousel="monitores">
+            <button class="carousel-nav-btn next-btn" onclick="scrollCarousel('monitores', 1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -359,7 +359,7 @@
         </div>
         
         <div class="carousel-wrapper position-relative">
-            <button class="carousel-nav-btn prev-btn" type="button" data-carousel="accesorios">
+            <button class="carousel-nav-btn prev-btn" onclick="scrollCarousel('accesorios', -1)">
                 <i class="fas fa-chevron-left"></i>
             </button>
             
@@ -388,7 +388,7 @@
                 @endforeach
             </div>
             
-            <button class="carousel-nav-btn next-btn" type="button" data-carousel="accesorios">
+            <button class="carousel-nav-btn next-btn" onclick="scrollCarousel('accesorios', 1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -889,44 +889,53 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Inicializar carrusel principal de Bootstrap
-    const carousel = ('#mainBannerCarousel');
-if (carousel) {
-new bootstrap.Carousel(carousel, {
-interval: 5000,
-wrap: true,
-pause: 'hover'
+    // Inicializar carrusel principal
+    const carousel = document.querySelector('#mainBannerCarousel');
+    if (carousel) {
+        new bootstrap.Carousel(carousel, {
+            interval: 5000,
+            wrap: true,
+            pause: 'hover'
+        });
+    }
 });
+
+// Función mejorada para controlar los carruseles de productos
+function scrollCarousel(carouselId, direction) {
+    const carousel = document.getElementById('carousel-' + carouselId);
+    if (!carousel) {
+        console.log('Carrusel no encontrado:', carouselId);
+        return;
+    }
+    
+    const cardWidth = 300; // Ancho de cada card + gap
+    const scrollAmount = cardWidth * direction;
+    
+    carousel.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+    });
 }
-// Controlador mejorado para los carruseles de productos
-document.querySelectorAll('.carousel-nav-btn').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Obtener el ID del carrusel desde el atributo data-carousel
-        const carouselId = this.getAttribute('data-carousel');
-        const carousel = document.getElementById('carousel-' + carouselId);
-        
-        if (!carousel) {
-            console.log('Carrusel no encontrado:', carouselId);
-            return;
-        }
-        
-        // Determinar dirección según la clase del botón
-        const direction = this.classList.contains('prev-btn') ? -1 : 1;
-        
-        // Ancho de desplazamiento (ancho de card + gap)
-        const cardWidth = 300;
-        const scrollAmount = cardWidth * direction;
-        
-        // Realizar scroll suave
-        carousel.scrollBy({
-            left: scrollAmount,
-            behavior: 'smooth'
+
+// Alternativa: Agregar event listeners directamente
+document.addEventListener('DOMContentLoaded', function() {
+    // Obtener todos los botones de navegación
+    document.querySelectorAll('.carousel-nav-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const carouselWrapper = this.closest('.carousel-wrapper');
+            const carousel = carouselWrapper.querySelector('.products-carousel');
+            const direction = this.classList.contains('prev-btn') ? -1 : 1;
+            const cardWidth = 300;
+            
+            carousel.scrollBy({
+                left: cardWidth * direction,
+                behavior: 'smooth'
+            });
         });
     });
-});
 });
 </script>
 @endpush
