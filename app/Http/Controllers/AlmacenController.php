@@ -110,7 +110,7 @@ class AlmacenController extends Controller
 
         // Subir imagen si existe
         if ($request->hasFile('imagen')) {
-            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $validated['imagen'] = $request->file('imagen')->store('productos', 's3');
         }
 
         $validated['user_id'] = auth()->id() ?? 1;
@@ -162,10 +162,10 @@ class AlmacenController extends Controller
         // Manejar imagen
         if ($request->hasFile('imagen')) {
             // Eliminar imagen anterior si existe
-            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
-                Storage::disk('public')->delete($producto->imagen);
+            if ($producto->imagen && Storage::disk('s3')->exists($producto->imagen)) {
+                Storage::disk('s3')->delete($producto->imagen);
             }
-            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $validated['imagen'] = $request->file('imagen')->store('productos', 's3');
         }
 
         $producto->update($validated);

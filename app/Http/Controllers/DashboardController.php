@@ -722,7 +722,7 @@ class DashboardController extends Controller
     $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
     if ($request->hasFile('imagen')) {
-        $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
+        $validated['imagen'] = $request->file('imagen')->store('productos', 's3');
     }
 
     $validated['user_id'] = auth()->id() ?? 1;
@@ -770,10 +770,10 @@ class DashboardController extends Controller
         $validated['precio_venta'] = round($validated['precio_venta'] * 1.18, 2);
 
         if ($request->hasFile('imagen')) {
-            if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
-                Storage::disk('public')->delete($producto->imagen);
+            if ($producto->imagen && Storage::disk('s3')->exists($producto->imagen)) {
+                Storage::disk('s3')->delete($producto->imagen);
             }
-            $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
+            $validated['imagen'] = $request->file('imagen')->store('productos', 's3');
         }
 
         $producto->update($validated);
